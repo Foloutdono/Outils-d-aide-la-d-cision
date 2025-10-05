@@ -1,0 +1,58 @@
+body {
+    width: 100%;
+    margin: 0;
+}
+header {
+    display: flex;
+    flex-direction: row;
+    position: sticky;
+    margin: 0.5rem auto;
+    max-width: calc(100% - 8rem);
+    justify-content: center;
+}
+.card_collection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 4rem auto;
+    max-width: calc(100% - 8rem);
+    justify-content: center;
+}
+.card {
+    display: flex;
+    background-color: rgb(168, 117, 184);
+    border-radius: 3rem;
+    min-width: 30%;
+    max-width: fit-content;
+    flex-grow: 2;
+    margin: 3rem;
+    justify-content: center;
+    justify-items: center;
+    color: white;
+    /* -webkit-text-stroke: 1px black; */
+    flex-direction: column;
+    box-shadow: 1.5rem 1.5rem 1rem rgb(78, 77, 77);
+
+    box-sizing: border-box;
+    padding: 1rem;
+}
+.card * {
+    font-size: 2rem;
+}
+.card a {
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+.card h1 {
+    font-size: 3rem;
+    font-weight: normal;
+    text-align: center;
+    margin: 0;
+    padding: 0.3rem;
+    font-family: "Titan one";
+}
+.card:hover {
+    flex-grow: 5;
+    background-color: rgb(123, 83, 136);
+}

@@ -1,0 +1,24 @@
+body {
+    display: flex;
+    justify-content: center;
+}
+#userForm {
+    margin: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    width: 20%;
+    
+}
+#userForm input {
+    width: 10rem;
+    align-self: center;
+    padding: 0.5rem;
+}
+#userForm button {
+    margin: 0.5rem;
+}
+#userForm label {
+    padding: 0.3rem;
+    text-align: center;
+}
