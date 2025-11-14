@@ -9,20 +9,21 @@ body {
     display: flex;
     flex-direction: column;
     justify-items: center;
-    width: 20%;
-    
+    width: 20%; 
 }
-#userForm input {
-    width: 10rem;
-    align-self: center;
-    padding: 0.5rem;
+#userForm fieldset {
+  margin-bottom: 5%;
+  padding: 5%;
 }
-#userForm button {
-    margin: 0.5rem;
+#param .field {
+  display: flex;
+  padding: 0.7vh;
 }
-#userForm label {
-    padding: 0.3rem;
-    text-align: center;
+#param .field label {
+  flex: 1;
+}
+#param .field input {
+  flex: 3;
 }
 
 table {

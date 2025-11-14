@@ -1,50 +1,31 @@
 class ResultTable {
-    constructor(nameTest) {
+    constructor(nameTest, résultats = null) {
         this.table = document.createElement("table");
-        let caption = document.createElement("caption");
-        caption.textContent = "Résultats du " + nameTest;
-
-        this.thead = document.createElement("thead");
-        let th_names = ["Xᵢ¹", "rᵢ", "pᵢ", "npᵢ", "(rᵢ-npᵢ)²/npᵢ"];
-        let tr = document.createElement("tr");
-        for (let th_name of th_names) {
-            let th = document.createElement("th");
-            th.textContent = th_name;
-            tr.appendChild(th);
-        }
-        this.thead.appendChild(tr)
-
-        this.tbody =  document.createElement("tbody");
-
-        this.tfoot = document.createElement("tfoot");
-        let th1 = document.createElement("th");
-        th1.textContent = "X² observé";
-        th1.scope = "row";
-        th1.colSpan = "4";
-        let td1 = document.createElement("td");
-        td1.textContent = "None";
-
-        let th2 = document.createElement("th");
-        th2.textContent = "Valeur critique";
-        th2.scope = "row";
-        th2.colSpan = "4";
-        let td2 = document.createElement("td");
-        td2.textContent = "None";
-
-        let tr1 = document.createElement("tr");
-        let tr2 = document.createElement("tr");
-        tr1.appendChild(th1);
-        tr1.appendChild(td1);
-        tr2.appendChild(th2);
-        tr2.appendChild(td2);
-
-        this.tfoot.appendChild(tr1);
-        this.tfoot.appendChild(tr2);
-
-        this.table.appendChild(caption);
-        this.table.appendChild(this.thead);
-        this.table.appendChild(this.tfoot);
-        this.table.appendChild(this.tbody);
+        this.table.innerHTML = `<caption>Résultats du ${nameTest}</caption>
+            <thead>
+                <tr>
+                    <th>Xᵢ¹</th>
+                    <th>rᵢ</th>
+                    <th>pᵢ</th>
+                    <th>npᵢ</th>
+                    <th>(rᵢ-npᵢ)²/npᵢ</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th scope="row" colspan="4">X² observé</th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row" colspan="4">Valeur critique</th>
+                    <td></td>
+                </tr>
+            </tfoot>
+        `
+        this.tfoot = this.table.getElementsByTagName("tfoot")[0];
+        this.tbody = this.table.getElementsByTagName("tbody")[0];
         document.body.appendChild(this.table);
     }
     addRow(row) {
@@ -57,6 +38,7 @@ class ResultTable {
         this.tbody.appendChild(tr);
     }
     addRésultats(résultats) {
+        console.log(résultats)
         for (let iRésultat in résultats) {
             this.tfoot.children[iRésultat].children[1].textContent = résultats[iRésultat]
         }
@@ -77,35 +59,35 @@ function init() {
 
         userform.style.display = "none";
 
-        let xn = generator(x0, a, c, m, n);
-        let un = xn.map((x) => (x / m));
-        let yn = un.map((u) => parseInt(u*10));
+        const xn = generator(x0, a, c, m, n);
+        const un = xn.map((x) => (x / m));
+        const yn = un.map((u) => parseInt(u*10));
 
-        let résultatsTableCourse = new ResultTable("test des courses");
-        let résultatsCourse = test_course(xn, m, n, alpha, résultatsTableCourse);
-        résultatsTableCourse.addRésultats(résultatsCourse)
-        
-        let résultatsTableFréquence = new ResultTable("test des fréquences");
-        let résultatsFréquence = test_fréquence(yn, m, n, alpha, résultatsTableFréquence);
-        résultatsTableFréquence.addRésultats(résultatsFréquence)
+        if (formData.get("course")) {
+            test_course(xn, m, n, alpha);
+        }
+        if (formData.get("poker")) {
+            test_poker(yn, n, alpha)
+        }
+        if (formData.get("frésuences")) {
+            test_fréquences(yn, m, n, alpha);
+        }
+        if (formData.get("saut")) {
+            test_saut(yn, m, n, alpha);
+        }
+        if (formData.get("carre")) {
+            test_carre(un, m, n, alpha);
+        }
 
-        let résultatsTableSaut = new ResultTable("test des sauts");
-        let résultatsSaut = test_saut(yn, m, n, alpha, résultatsTableSaut);
-        résultatsTableSaut.addRésultats(résultatsSaut)
+        // let résultatsTablePoisson = new ResultTable("test poisson");
+        // let résultatsPoisson = test_poisson([0, 1, 2, 3, 4, 5, 6], [29, 34, 24, 9, 3, 1, 0], 0.05, résultatsTablePoisson);
+        // résultatsTablePoisson.addRésultats(résultatsPoisson)
 
-        let résultatsTableCarre = new ResultTable("test des carrés unités");
-        let résultatsCarre = test_carre(un, m, n, alpha, résultatsTableCarre);
-        résultatsTableCarre.addRésultats(résultatsCarre)
-
-        let résultatsTablePoisson = new ResultTable("test poisson");
-        let résultatsPoisson = test_poisson([0, 1, 2, 3, 4, 5, 6], [29, 34, 24, 9, 3, 1, 0], 0.05, résultatsTablePoisson);
-        résultatsTablePoisson.addRésultats(résultatsPoisson)
-
-        let résultatsTableExp = new ResultTable("test exp");
-        let résultatsExp = test_exp_neg([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7],[7, 8],[8, 9],[9, 10],[10, 11],[11, 12]],
-                                         [23, 20, 14, 12, 9, 5, 4, 5, 3, 2, 2, 1],
-                                          0.05, résultatsTableExp);
-        résultatsTableExp.addRésultats(résultatsExp)
+        // let résultatsTableExp = new ResultTable("test exp");
+        // let résultatsExp = test_exp_neg([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7],[7, 8],[8, 9],[9, 10],[10, 11],[11, 12]],
+        //                                  [23, 20, 14, 12, 9, 5, 4, 5, 3, 2, 2, 1],
+        //                                   0.05, résultatsTableExp);
+        // résultatsTableExp.addRésultats(résultatsExp)
 
     });
 }
@@ -118,7 +100,8 @@ function generator(x0, a, c, m, n) {
     }
     return random_numbers;
 }
-function test_course(xn, m, n, alpha, resultsTable) {
+function test_course(xn, m, n, alpha) {
+    const resultsTable = new ResultTable("Test des courses");
     let rn = {};
     let len = 1;
     for (let i = 1; i < n; i++) {
@@ -137,18 +120,21 @@ function test_course(xn, m, n, alpha, resultsTable) {
     }
     let variable_observe = 0;
     for (prop in rn) {
-        let value = Number(prop);
-        let ri = rn[prop];
-        let pi = (value/factorial((value+1)));
-        let npi = n * pi;
-        let contribution = ((ri - npi)**2) / npi;
+        const value = Number(prop);
+        const ri = rn[prop];
+        const pi = (value/factorial((value+1)));
+        const npi = n * pi;
+        const contribution = ((ri - npi)**2) / npi;
         variable_observe += contribution;
         resultsTable.addRow([prop, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)),  parseFloat(contribution.toFixed(4))]);
     }
     v = Object.keys(rn).length - 1;
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+
+    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)]);
 }
-function test_fréquence(yn, m, n, alpha, resultsTable) {
+function test_fréquences(yn, m, n, alpha) {
+    const resultsTable = new ResultTable("test des fréquences");
+
     let rn = {};
     for (let i = 0; i < n; i++) {
         if (rn.hasOwnProperty(yn[i])) {
@@ -159,18 +145,20 @@ function test_fréquence(yn, m, n, alpha, resultsTable) {
     }
     let variable_observe = 0;
     for (prop in rn) {
-        let value = Number(prop);
-        let ri = rn[prop];
-        let pi = 1/10;
-        let npi = n * pi;
-        let contribution = ((ri - npi)**2) / npi;
+        const ri = rn[prop];
+        const pi = 1/10;
+        const npi = n * pi;
+        const contribution = ((ri - npi)**2) / npi;
         variable_observe += contribution;
         resultsTable.addRow([prop, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)),  parseFloat(contribution.toFixed(4))]);
     }
     v = Object.keys(rn).length - 1;
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+
+    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)])
 }
-function test_saut(yn, m, n, alpha, resultsTable) {
+function test_saut(yn, m, n, alpha) {
+    const resultsTable = new ResultTable("test des sauts");
+
     let rn = {};
     let tailles_sauts = {};
     for (let x of yn) {
@@ -233,10 +221,12 @@ function test_saut(yn, m, n, alpha, resultsTable) {
         resultsTable.addRow([valueName, riSum, parseFloat(pi.toFixed(4)), parseFloat(npiSum.toFixed(4)), parseFloat(contribution.toFixed(4))]);
         v = resultsTable.tbody.children.length - 1;
     }
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)])
 }
 
-function test_carre(un, m, n, alpha, resultsTable) {
+function test_carre(un, m, n, alpha) {
+    let resultsTable = new ResultTable("test des carrés unités");
+
     if (n % 4 != 0) {
         return;
     }
@@ -267,7 +257,7 @@ function test_carre(un, m, n, alpha, resultsTable) {
         }
     }
     v = Object.keys(rn).length - 1;
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)])
 }
 function test_poisson(xn, rn, alpha, resultsTable) {
     let n = rn.reduce((acc, val) => acc + val, 0);
@@ -430,4 +420,70 @@ function somme_pond(x, y) {
         somme_p += x[i] * y[i];
     }
     return somme_p / n;
+}
+
+
+function test_poker(yn, n, alpha) {
+    const resultsTable = new ResultTable("test du poker");
+    const categories = {
+        "poker": 10 / 100000,
+        "carre": 450 / 100000,
+        "full": 900 / 100000,
+        "brelan": 7200 / 100000,
+        "double_paire": 10800 / 100000,
+        "paire": 50400 / 100000,
+        "rien": 30240 / 100000
+    };
+    let ris = {
+        poker: 0,
+        carre: 0,
+        full: 0,
+        brelan: 0,
+        double_paire: 0,
+        paire: 0,
+        rien: 0
+    };
+    const nbCartesMain = 5;
+    const nbMains = Math.floor(n / nbCartesMain);
+
+    for (let i = 0; i < nbMains; i++) {
+        const bloc = yn.slice(i * nbCartesMain, i * nbCartesMain + nbCartesMain);
+
+        let counts = {};
+        bloc.forEach(v => counts[v] = (counts[v] || 0) + 1);
+
+        let valeurs = Object.values(counts).sort((a, b) => b - a);
+
+        if (valeurs[0] === 5) ris.poker++;
+        else if (valeurs[0] === 4) ris.carre++;
+        else if (valeurs[0] === 3 && valeurs[1] === 2) ris.full++;
+        else if (valeurs[0] === 3) ris.brelan++;
+        else if (valeurs[0] === 2 && valeurs[1] === 2) ris.double_paire++;
+        else if (valeurs[0] === 2) ris.paire++;
+        else ris.rien++;
+    }
+
+    let variable_observe = 0;
+
+    for (let categorie in categories) {
+        const pi = categories[categorie];
+        const ri = ris[categorie];
+        const npi = nbMains * pi;
+        const contribution = ((ri - npi) ** 2) / npi;
+
+        variable_observe += contribution;
+
+        resultsTable.addRow([
+            categorie,
+            ri,
+            parseFloat(pi.toFixed(5)),
+            parseFloat(npi.toFixed(4)),
+            parseFloat(contribution.toFixed(4))
+        ]);
+    }
+
+    let v = Object.keys(categories).length - 1;
+    let seuil = jStat.chisquare.inv(1 - alpha, v);
+
+    resultsTable.addRésultats([variable_observe, seuil])
 }
