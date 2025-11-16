@@ -1,25 +1,24 @@
-import TableRésultats from "./tableRésultats.js";
-export default function test_fréquences(yn, m, n, alpha) {
-    const resultsTable = new TableRésultats("test des fréquences");
-
+export default function test_fréquences(params, resultsTable) {
     let rn = {};
-    for (let i = 0; i < n; i++) {
-        if (rn.hasOwnProperty(yn[i])) {
-            rn[yn[i]]++;
+    for (let i = 0; i < params.n; i++) {
+        if (rn.hasOwnProperty(params.yn[i])) {
+            rn[params.yn[i]]++;
         } else {
-            rn[yn[i]] = 1;
+            rn[params.yn[i]] = 1;
         }
     }
-    let variable_observe = 0;
-    for (let prop in rn) {
-        const ri = rn[prop];
+    for (let Xi in rn) {
+        const ri = rn[Xi];
         const pi = 1/10;
-        const npi = n * pi;
+        const npi = params.n * pi;
         const contribution = ((ri - npi)**2) / npi;
-        variable_observe += contribution;
-        resultsTable.addRow([prop, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)),  parseFloat(contribution.toFixed(4))]);
+        const row = {
+            Xi: Xi,
+            ri: ri,
+            pi: pi,
+            npi: npi,
+            contribution: contribution,
+        }
+        resultsTable.addRow(row);
     }
-    const v = Object.keys(rn).length - 1;
-
-    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)])
 }

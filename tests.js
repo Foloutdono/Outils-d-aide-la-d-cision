@@ -3,8 +3,9 @@ import test_fréquences from "./testFréquences.js";
 import test_saut from "./testSaut.js";
 import test_carre from "./testCarre.js";
 import test_poker from "./testPoker.js";
+import Test from "./test.js";
 function init() {
-    let userform = document.getElementById("userForm");
+    const userform = document.getElementById("userForm");
     userform.addEventListener("submit", (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
@@ -16,26 +17,54 @@ function init() {
         const x0 = Number(formData.get("x0"));
         const n = Number(formData.get("n"));
 
-        userform.style.display = "none";
+        const resultsHullDobell = hullDobell(a, c, m);
+        if (resultsHullDobell.includes(false)) {
+            const errorbox = document.getElementById("errorboxParam");
+            errorbox.hidden = false;
+            let htmlContent = "<h4>Les paramètres doivent respecter le théorème d'HULL-DOBELL</h4>";
+            htmlContent += "<ul>";
+            for (let iRésultat = 0; iRésultat < 3; iRésultat++) {
+                if (!resultsHullDobell[iRésultat]) {
+                    htmlContent += `<li>L'hypothèse ${iRésultat+1} n'est pas respectée.</li>`;
+                }
+            }
+            htmlContent += '</ul>';
+            errorbox.innerHTML = htmlContent;
 
-        const xn = generator(x0, a, c, m, n);
-        const un = xn.map((x) => (x / m));
-        const yn = un.map((u) => parseInt(u*10));
+            if (!document.getElementById("rappelThéorème")) {
+                const théorèmeImage = document.createElement("img");
+                théorèmeImage.id = "rappelThéorème";
+                théorèmeImage.src = "théorèmeHULL-DOBELL.png";
+                théorèmeImage.width = 687;
+                théorèmeImage.height = 185;
+                document.body.appendChild(théorèmeImage);
+            }
+        } else {
+            userform.style.display = "none";
+            const théorèmeImage = document.getElementById("rappelThéorème");
+            if (théorèmeImage) {
+                théorèmeImage.hidden = true;
+            }
 
-        if (formData.get("course")) {
-            test_course(xn, m, n, alpha);
-        }
-        if (formData.get("poker")) {
-            test_poker(yn, n, alpha)
-        }
-        if (formData.get("fréquences")) {
-            test_fréquences(yn, m, n, alpha);
-        }
-        if (formData.get("saut")) {
-            test_saut(yn, m, n, alpha);
-        }
-        if (formData.get("carre")) {
-            test_carre(un, m, n, alpha);
+            const xn = generator(x0, a, c, m, n);
+            const un = xn.map((x) => (x / m));
+            const yn = un.map((u) => parseInt(u*10));
+
+            if (formData.get("courses")) {
+                new Test("Test des courses", "courses", test_course, {xn, m, n, alpha})
+            }
+            if (formData.get("poker")) {
+                new Test("Test du poker", "poker", test_poker, {yn, n, alpha})
+            }
+            if (formData.get("fréquences")) {
+                new Test("Test des fréquences", "fréquences", test_fréquences, {yn, n, alpha})
+            }
+            if (formData.get("sauts")) {
+                new Test("Test des sauts", "sauts", test_saut, {yn, n, alpha});
+            }
+            if (formData.get("carré")) {
+                new Test("Test du carré-unité", "carré", test_carre, {un, n, alpha});
+            }
         }
 
         // let résultatsTablePoisson = new ResultTable("test poisson");
@@ -52,6 +81,55 @@ function init() {
 }
 window.onload = init;
 
+function hullDobell(a, c, m) {
+    return [hypotèse1(c, m), hypotèse2(a, m), hypotèse3(a, m)];
+}
+function hypotèse1(c, m) {
+    return sontPremiersEntreEux(c, m);
+}
+function hypotèse2(a, m) {
+    let facteursPremiersDeM = facteursPremiersUniques(m);
+    let iFacteur = 0;
+    while (iFacteur < facteursPremiersDeM.length && (a-1) % facteursPremiersDeM[iFacteur] === 0) {
+        iFacteur++;
+    }
+    return iFacteur === facteursPremiersDeM.length;
+}
+function hypotèse3(a, m) {
+    return (m % 4 ==! 0) || ((a-1) % 4 === 0)
+}
+function facteursPremiersUniques(n) {
+    const facteurs = new Set();
+
+    if (n % 2 === 0) {
+        facteurs.add(2);
+        while (n % 2 === 0) {
+            n /= 2;
+        }
+    }
+
+    let i = 3;
+    while (i ** 2 <= n) {
+        if (n % i === 0) {
+            facteurs.add(i);
+            while (n % i === 0) {
+                n /= i;
+            }
+        }
+        i += 2;
+    }
+
+    if (n > 1) facteurs.add(n);
+
+    return [...facteurs];
+}
+function sontPremiersEntreEux(x, y) {
+    while (y !== 0) {
+        [x, y] = [y, x % y];
+    }
+
+    return x === 1;
+}
 function generator(x0, a, c, m, n) {
     let random_numbers = [x0];
     for (let i = 0;i < n-1; i++) {
@@ -59,151 +137,151 @@ function generator(x0, a, c, m, n) {
     }
     return random_numbers;
 }
-function test_poisson(xn, rn, alpha, resultsTable) {
-    let n = rn.reduce((acc, val) => acc + val, 0);
-    let lamda = somme_pond(xn, rn);
-    let pn = Pn_p(lamda, xn);
-    let variable_observe= 0;
+// function test_poisson(xn, rn, alpha, resultsTable) {
+//     let n = rn.reduce((acc, val) => acc + val, 0);
+//     let lamda = somme_pond(xn, rn);
+//     let pn = Pn_p(lamda, xn);
+//     let variable_observe= 0;
 
-    let regroup = false;
-    let riSum = 0;
-    let npiSum = 0;
-    let debReg = null;
-    let endReg = null;
-    let v = null;
-    for (let i = 0; i < xn.length; i++) {
-        let ri = rn[i];
-        let xi = xn[i];
-        let pi = pn[i];
-        let npi = pi *n;
-        regroup = npi < 5;
-        if (!regroup) {
-            let contribution = ((ri - npi)**2) / npi;
-            variable_observe += contribution;
-            resultsTable.addRow([xi, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)), parseFloat(contribution.toFixed(4))]);
-        } else {
-            if (!debReg) {
-                debReg = xi;
-            }
-            endReg = xi;
-            riSum += ri;
-            npiSum += npi;
-        }
-    }
-    if (!regroup) {
-        v = Object.keys(rn).length - 2;
-    } else {
-        if (npiSum < 5) {
-            prevRow = resultsTable.tbody.children[resultsTable.tbody.children.length-1]
-            debReg = prevRow.children[0].textContent;
-            npiSum += Number(prevRow.children[3].textContent);
-            riSum += Number(prevRow.children[1].textContent);
-            variable_observe -= Number(prevRow.children[4].textContent);
-            resultsTable.tbody.lastElementChild.remove();
-        }
-        let contribution = ((riSum - npiSum) ** 2) / npiSum;
-        let pi = npiSum / n;
-        variable_observe += contribution;
-        let valueName = `[${debReg};${endReg}]`
-        resultsTable.addRow([valueName, riSum, parseFloat(pi.toFixed(4)), parseFloat(npiSum.toFixed(4)), parseFloat(contribution.toFixed(4))]);
-        v = resultsTable.tbody.children.length - 2;
-    }
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
-}
-function test_exp_neg(xn, rn, alpha, resultsTable) {
-    let cn = [];
-    for (let i = 0; i < xn.length; i++) {
-        cn.push((xn[i][0] + xn[i][1]) / 2);
-    }
-    let n = rn.reduce((acc, val) => acc + val, 0);
-    let espérence = somme_pond(cn, rn);
-    let pn = Pn_exp(xn, 1/espérence);
-    let variable_observe= 0;
+//     let regroup = false;
+//     let riSum = 0;
+//     let npiSum = 0;
+//     let debReg = null;
+//     let endReg = null;
+//     let v = null;
+//     for (let i = 0; i < xn.length; i++) {
+//         let ri = rn[i];
+//         let xi = xn[i];
+//         let pi = pn[i];
+//         let npi = pi *n;
+//         regroup = npi < 5;
+//         if (!regroup) {
+//             let contribution = ((ri - npi)**2) / npi;
+//             variable_observe += contribution;
+//             resultsTable.addRow([xi, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)), parseFloat(contribution.toFixed(4))]);
+//         } else {
+//             if (!debReg) {
+//                 debReg = xi;
+//             }
+//             endReg = xi;
+//             riSum += ri;
+//             npiSum += npi;
+//         }
+//     }
+//     if (!regroup) {
+//         v = Object.keys(rn).length - 2;
+//     } else {
+//         if (npiSum < 5) {
+//             prevRow = resultsTable.tbody.children[resultsTable.tbody.children.length-1]
+//             debReg = prevRow.children[0].textContent;
+//             npiSum += Number(prevRow.children[3].textContent);
+//             riSum += Number(prevRow.children[1].textContent);
+//             variable_observe -= Number(prevRow.children[4].textContent);
+//             resultsTable.tbody.lastElementChild.remove();
+//         }
+//         let contribution = ((riSum - npiSum) ** 2) / npiSum;
+//         let pi = npiSum / n;
+//         variable_observe += contribution;
+//         let valueName = `[${debReg};${endReg}]`
+//         resultsTable.addRow([valueName, riSum, parseFloat(pi.toFixed(4)), parseFloat(npiSum.toFixed(4)), parseFloat(contribution.toFixed(4))]);
+//         v = resultsTable.tbody.children.length - 2;
+//     }
+//     return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+// }
+// function test_exp_neg(xn, rn, alpha, resultsTable) {
+//     let cn = [];
+//     for (let i = 0; i < xn.length; i++) {
+//         cn.push((xn[i][0] + xn[i][1]) / 2);
+//     }
+//     let n = rn.reduce((acc, val) => acc + val, 0);
+//     let espérence = somme_pond(cn, rn);
+//     let pn = Pn_exp(xn, 1/espérence);
+//     let variable_observe= 0;
 
-    let regroup = false;
-    let riSum = 0;
-    let npiSum = 0;
-    let debReg = null;
-    let endReg = null;
-    let v = null;
-    for (let i = 0; i < xn.length; i++) {
-        let ri = rn[i];
-        let xi = xn[i];
-        let pi = pn[i];
-        let npi = pi *n;
-        regroup = npi < 5;
-        if (!regroup) {
-            let contribution = ((ri - npi)**2) / npi;
-            variable_observe += contribution;
-            resultsTable.addRow([xi, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)), parseFloat(contribution.toFixed(4))]);
-        } else {
-            if (!debReg) {
-                debReg = xi[0];
-            }
-            endReg = xi[1];
-            riSum += ri;
-            npiSum += npi;
-        }
-    }
-    if (!regroup) {
-        v = Object.keys(rn).length - 2;
-    } else {
-        if (npiSum < 5) {
-            prevRow = resultsTable.tbody.children[resultsTable.tbody.children.length-1]
-            debReg = prevRow.children[0].textContent;
-            npiSum += Number(prevRow.children[3].textContent);
-            riSum += Number(prevRow.children[1].textContent);
-            variable_observe -= Number(prevRow.children[4].textContent);
-            resultsTable.tbody.lastElementChild.remove();
-        }
-        let contribution = ((riSum - npiSum) ** 2) / npiSum;
-        let pi = npiSum / n;
-        variable_observe += contribution;
-        let valueName = `[${debReg};${endReg}]`
-        resultsTable.addRow([valueName, riSum, parseFloat(pi.toFixed(4)), parseFloat(npiSum.toFixed(4)), parseFloat(contribution.toFixed(4))]);
-        v = resultsTable.tbody.children.length - 2;
-    }
-    return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
-}
+//     let regroup = false;
+//     let riSum = 0;
+//     let npiSum = 0;
+//     let debReg = null;
+//     let endReg = null;
+//     let v = null;
+//     for (let i = 0; i < xn.length; i++) {
+//         let ri = rn[i];
+//         let xi = xn[i];
+//         let pi = pn[i];
+//         let npi = pi *n;
+//         regroup = npi < 5;
+//         if (!regroup) {
+//             let contribution = ((ri - npi)**2) / npi;
+//             variable_observe += contribution;
+//             resultsTable.addRow([xi, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)), parseFloat(contribution.toFixed(4))]);
+//         } else {
+//             if (!debReg) {
+//                 debReg = xi[0];
+//             }
+//             endReg = xi[1];
+//             riSum += ri;
+//             npiSum += npi;
+//         }
+//     }
+//     if (!regroup) {
+//         v = Object.keys(rn).length - 2;
+//     } else {
+//         if (npiSum < 5) {
+//             prevRow = resultsTable.tbody.children[resultsTable.tbody.children.length-1]
+//             debReg = prevRow.children[0].textContent;
+//             npiSum += Number(prevRow.children[3].textContent);
+//             riSum += Number(prevRow.children[1].textContent);
+//             variable_observe -= Number(prevRow.children[4].textContent);
+//             resultsTable.tbody.lastElementChild.remove();
+//         }
+//         let contribution = ((riSum - npiSum) ** 2) / npiSum;
+//         let pi = npiSum / n;
+//         variable_observe += contribution;
+//         let valueName = `[${debReg};${endReg}]`
+//         resultsTable.addRow([valueName, riSum, parseFloat(pi.toFixed(4)), parseFloat(npiSum.toFixed(4)), parseFloat(contribution.toFixed(4))]);
+//         v = resultsTable.tbody.children.length - 2;
+//     }
+//     return [variable_observe, jStat.chisquare.inv(1 - alpha, v)];
+// }
 
 
-const factorial = n =>
-    n < 0 ? null : Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);
+// const factorial = n =>
+//     n < 0 ? null : Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);
 
-function P(x, y) {
-  return ((Math.E**-x) * x**y) / factorial(y);
-}
-function Pn_p(x, y) {
-    pn = []
-    for (let i = 0; i < y.length; i++) {
-        pn.push(P(x, i));
-    }
-    return pn;
-}
-function exp_neg(a, b, mu) {
-    return (Math.E ** (-mu * a)) - (Math.E ** (-mu * b))
-}
-function Pn_exp(xn, mu) {
-    pn = []
-    for (let i = 0; i < xn.length; i++) {
-        pn.push(exp_neg(xn[i][0], xn[i][1], mu));
-    }
-    return pn;
-}
-function arrivées_clients(ui) {
-    let nbClients = 0;
-    let sum_prob = P(0.83, 0);
-    while (ui > sum_prob) {
-        nbClients++;
-        sum_prob += P(0.83, nbClients);
-    }
-    return nbClients;
-}
-function somme_pond(x, y) {
-    let n = y.reduce((acc, val) => acc + val, 0);
-    let somme_p = 0;
-    for (let i = 0; i < x.length; i++) {
-        somme_p += x[i] * y[i];
-    }
-    return somme_p / n;
-}
+// function P(x, y) {
+//   return ((Math.E**-x) * x**y) / factorial(y);
+// }
+// function Pn_p(x, y) {
+//     pn = []
+//     for (let i = 0; i < y.length; i++) {
+//         pn.push(P(x, i));
+//     }
+//     return pn;
+// }
+// function exp_neg(a, b, mu) {
+//     return (Math.E ** (-mu * a)) - (Math.E ** (-mu * b))
+// }
+// function Pn_exp(xn, mu) {
+//     pn = []
+//     for (let i = 0; i < xn.length; i++) {
+//         pn.push(exp_neg(xn[i][0], xn[i][1], mu));
+//     }
+//     return pn;
+// }
+// function arrivées_clients(ui) {
+//     let nbClients = 0;
+//     let sum_prob = P(0.83, 0);
+//     while (ui > sum_prob) {
+//         nbClients++;
+//         sum_prob += P(0.83, nbClients);
+//     }
+//     return nbClients;
+// }
+// function somme_pond(x, y) {
+//     let n = y.reduce((acc, val) => acc + val, 0);
+//     let somme_p = 0;
+//     for (let i = 0; i < x.length; i++) {
+//         somme_p += x[i] * y[i];
+//     }
+//     return somme_p / n;
+// }

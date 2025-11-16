@@ -11,6 +11,13 @@ body {
     justify-items: center;
     width: 20%; 
 }
+img {
+  align-self: center;
+}
+p {
+  width: fit-content;
+}
+
 #userForm fieldset {
   margin-bottom: 5%;
   padding: 5%;
@@ -24,6 +31,32 @@ body {
 }
 #param .field input {
   flex: 3;
+}
+.test {
+  border: 3px black solid;
+  padding: 1rem;
+  margin: 1rem;
+  max-width: 45%;
+}
+.test h1 {
+  text-align: center;
+}
+
+.errorbox {
+  color: red;
+  background-color: rgb(231, 228, 228);
+  margin-top: 10px;
+  padding: 7px;
+}
+.errorbox h4 {
+  padding-bottom: 10px;
+  margin: 0;
+}
+.errorbox ul {
+  display: block;
+  padding-inline-start: 20px;
+  unicode-bidi: isolate;
+  margin: 0;
 }
 
 table {

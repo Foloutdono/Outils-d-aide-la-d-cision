@@ -1,13 +1,11 @@
-import TableRésultats from "./tableRésultats.js";
-export default function test_course(xn, m, n, alpha) {
-    const resultsTable = new TableRésultats("Test des courses");
+export default function test_course(params, resultsTable) {
     let rn = {};
     let len = 1;
-    for (let i = 1; i < n; i++) {
-        if (xn[i-1] < xn[i]) {
+    for (let i = 1; i < params.n; i++) {
+        if (params.xn[i-1] < params.xn[i]) {
             len++;
         }
-        if (!(xn[i-1] < xn[i]) || i+1 == n) {
+        if (!(params.xn[i-1] < params.xn[i]) || i+1 == params.n) {
             if (rn.hasOwnProperty(len)) {
                 rn[len]++;
             } else {
@@ -17,19 +15,21 @@ export default function test_course(xn, m, n, alpha) {
             i++;
         }
     }
-    let variable_observe = 0;
-    for (let prop in rn) {
-        const value = Number(prop);
-        const ri = rn[prop];
+    for (let Xi in rn) {
+        const value = Number(Xi);
+        const ri = rn[Xi];
         const pi = (value/factorial((value+1)));
-        const npi = n * pi;
+        const npi = params.n * pi;
         const contribution = ((ri - npi)**2) / npi;
-        variable_observe += contribution;
-        resultsTable.addRow([prop, ri, parseFloat(pi.toFixed(4)), parseFloat(npi.toFixed(4)),  parseFloat(contribution.toFixed(4))]);
+        const row = {
+            Xi: Xi,
+            ri: ri,
+            pi: pi,
+            npi: npi,
+            contribution: contribution,
+        }
+        resultsTable.addRow(row);
     }
-    const v = Object.keys(rn).length - 1;
-
-    resultsTable.addRésultats([variable_observe, jStat.chisquare.inv(1 - alpha, v)]);
 }
 const factorial = n =>
     n < 0 ? null : Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);

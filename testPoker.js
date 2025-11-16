@@ -1,6 +1,4 @@
-import TableRésultats from "./tableRésultats.js";
-export default function test_poker(yn, n, alpha) {
-    const resultsTable = new TableRésultats("test du poker");
+export default function test_poker(params, resultsTable) {
     const categories = {
         "poker": 10 / 100000,
         "carre": 450 / 100000,
@@ -20,10 +18,10 @@ export default function test_poker(yn, n, alpha) {
         rien: 0
     };
     const nbCartesMain = 5;
-    const nbMains = Math.floor(n / nbCartesMain);
+    const nbMains = Math.floor(params.n / nbCartesMain);
 
     for (let i = 0; i < nbMains; i++) {
-        const bloc = yn.slice(i * nbCartesMain, i * nbCartesMain + nbCartesMain);
+        const bloc = params.yn.slice(i * nbCartesMain, i * nbCartesMain + nbCartesMain);
 
         let counts = {};
         bloc.forEach(v => counts[v] = (counts[v] || 0) + 1);
@@ -38,28 +36,21 @@ export default function test_poker(yn, n, alpha) {
         else if (valeurs[0] === 2) ris.paire++;
         else ris.rien++;
     }
+    for (let Xi in categories) {
+        const ri = ris[Xi];
+        if (ri > 0) {
+            const pi = categories[Xi];
+            const npi = nbMains * pi;
+            const contribution = ((ri - npi) ** 2) / npi;
 
-    let variable_observe = 0;
-
-    for (let categorie in categories) {
-        const pi = categories[categorie];
-        const ri = ris[categorie];
-        const npi = nbMains * pi;
-        const contribution = ((ri - npi) ** 2) / npi;
-
-        variable_observe += contribution;
-
-        resultsTable.addRow([
-            categorie,
-            ri,
-            parseFloat(pi.toFixed(5)),
-            parseFloat(npi.toFixed(4)),
-            parseFloat(contribution.toFixed(4))
-        ]);
+            const row = {
+                Xi: Xi,
+                ri: ri,
+                pi: pi,
+                npi: npi,
+                contribution: contribution,
+            }
+            resultsTable.addRow(row);
+        }
     }
-
-    let v = Object.keys(categories).length - 1;
-    let seuil = jStat.chisquare.inv(1 - alpha, v);
-
-    resultsTable.addRésultats([variable_observe, seuil])
 }
