@@ -49,6 +49,21 @@ function init() {
             const xn = generator(x0, a, c, m, n);
             const un = xn.map((x) => (x / m));
             const yn = un.map((u) => parseInt(u*10));
+            const per = periode(x0, a, c, m);
+
+            const suiteGénéré = document.createElement("div");
+            suiteGénéré.id= "valeursSuite";
+            suiteGénéré.innerHTML = `
+                <h1>Suite Générée</h1>
+                <ul>
+                    <li>xn : ${formatArray(xn, 0)}</li>
+                    <li>un : ${formatArray(un, 4)}</li>
+                    <li>yn : ${formatArray(yn, 0)}</li>
+                    <li>période : ${per}</li>
+                    <li>n : ${n}</li>
+                </ul>
+            `;
+            document.body.appendChild(suiteGénéré);
 
             if (formData.get("courses")) {
                 new Test("Test des courses", "courses", test_course, {xn, m, n, alpha})
@@ -137,6 +152,31 @@ function generator(x0, a, c, m, n) {
     }
     return random_numbers;
 }
+function periode(x0, a, c, m) {
+    let x = (a * x0 + c) % m;
+    let count = 1;
+    while (x !== x0) {
+        x = (a * x + c) % m;
+        count++;
+    }
+    return count;
+}
+const formatArray = (arr, decimals = 4) => {
+    const first5 = arr.slice(0, 5);
+    const last = arr[arr.length - 1];
+
+    const formatted = first5.map(x => typeof x === "number" ? x.toFixed(decimals) : x);
+
+    if (arr.length > 6) {
+        formatted.push("...");
+        formatted.push(typeof last === "number" ? last.toFixed(decimals) : last);
+    } else if (arr.length === 6) {
+        formatted.push(typeof last === "number" ? last.toFixed(decimals) : last);
+    }
+    return `[${formatted.join(", ")}]`;
+};
+
+
 // function test_poisson(xn, rn, alpha, resultsTable) {
 //     let n = rn.reduce((acc, val) => acc + val, 0);
 //     let lamda = somme_pond(xn, rn);
@@ -248,13 +288,13 @@ function generator(x0, a, c, m, n) {
 // const factorial = n =>
 //     n < 0 ? null : Array.from({ length: n }, (_, i) => i + 1).reduce((a, b) => a * b, 1);
 
-// function P(x, y) {
+// function li(x, y) {
 //   return ((Math.E**-x) * x**y) / factorial(y);
 // }
 // function Pn_p(x, y) {
 //     pn = []
 //     for (let i = 0; i < y.length; i++) {
-//         pn.push(P(x, i));
+//         pn.push(li(x, i));
 //     }
 //     return pn;
 // }
@@ -270,10 +310,10 @@ function generator(x0, a, c, m, n) {
 // }
 // function arrivées_clients(ui) {
 //     let nbClients = 0;
-//     let sum_prob = P(0.83, 0);
+//     let sum_prob = li(0.83, 0);
 //     while (ui > sum_prob) {
 //         nbClients++;
-//         sum_prob += P(0.83, nbClients);
+//         sum_prob += li(0.83, nbClients);
 //     }
 //     return nbClients;
 // }
