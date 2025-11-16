@@ -50,7 +50,7 @@ export default function test_poker(params, resultsTable) {
                 npi: npi,
                 contribution: contribution,
             }
-            resultsTable.addRow(row);
+            resultsTable.ajouteLigne(row);
         }
     }
 }

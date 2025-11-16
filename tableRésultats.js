@@ -1,62 +1,62 @@
 export default class TableRésultats {
-    constructor(nameTest) {
+    constructor(nomTest) {
         this.table = [];
-        this.nameTest = nameTest;
+        this.nomTest = nomTest;
     }
-    addRow(row) {
-        this.table.push(row);
+    ajouteLigne(ligne) {
+        this.table.push(ligne);
     }
-    regroupTable(table) {
-        let result = [];
-        let i = 0;
-        let done = false;
+    regroupementTable(table) {
+        let nouvelleTable = [];
+        let iLigne = 0;
+        let fini = false;
 
-        while (i < table.length && !done) {
-            if (table[i].npi >= 5) {
-                result.push(table[i]);
-                i++;
+        while (iLigne < table.length && !fini) {
+            if (table[iLigne].npi >= 5) {
+                nouvelleTable.push(table[iLigne]);
+                iLigne++;
             } else {
-                let riSum = table[i].ri;
-                let npiSum = table[i].npi;
-                let XiList = [table[i].Xi];
-                let n = table[i].npi / table[i].pi;
+                let riSum = table[iLigne].ri;
+                let npiSum = table[iLigne].npi;
+                let XiList = [table[iLigne].Xi];
+                let n = table[iLigne].npi / table[iLigne].pi;
 
-                i++;
-                while (i < table.length && npiSum < 5) {
-                    riSum += table[i].ri;
-                    npiSum += table[i].npi;
-                    XiList.push(table[i].Xi);
-                    i++;
+                iLigne++;
+                while (iLigne < table.length && npiSum < 5) {
+                    riSum += table[iLigne].ri;
+                    npiSum += table[iLigne].npi;
+                    XiList.push(table[iLigne].Xi);
+                    iLigne++;
                 }
                 if (npiSum < 5) {
-                    let prev = result.pop();
+                    let lignePréc = nouvelleTable.pop();
 
-                    prev.ri += riSum;
-                    prev.npi += npiSum;
-                    prev.Xi = "[" + prev.Xi + "," + XiList.join(",") + "]";
-                    prev.pi = prev.npi / n;
-                    prev.contribution = ((prev.ri - prev.npi) ** 2) / prev.npi;
+                    lignePréc.ri += riSum;
+                    lignePréc.npi += npiSum;
+                    lignePréc.Xi = "[" + lignePréc.Xi + "," + XiList.join(",") + "]";
+                    lignePréc.pi = lignePréc.npi / n;
+                    lignePréc.contribution = ((lignePréc.ri - lignePréc.npi) ** 2) / lignePréc.npi;
 
-                    result.push(prev);
-                    done = true;
+                    nouvelleTable.push(lignePréc);
+                    fini = true;
                 } else {
-                    let row = {
+                    let ligne = {
                         Xi: "[" + XiList.join(",") + "]",
                         ri: riSum,
                         pi: parseFloat((npiSum / n).toFixed(4)),
                         npi: parseFloat(npiSum.toFixed(4)),
                         contribution: parseFloat(((riSum - npiSum) ** 2 / npiSum).toFixed(4))
                     };
-                    result.push(row);
+                    nouvelleTable.push(ligne);
                 }
             }
         }
-        this.tableRegrouped = result;
+        this.tableRegroupé = nouvelleTable;
     }
-    getTableHtml(alpha, regrouped = false) {
+    getTableHtml(alpha, regroupé = false) {
         let innerHTML = `
         <table>
-            <caption>Résultats du ${this.nameTest}</caption>
+            <caption>${this.nomTest} ${regroupé ? "avec regroupement": "sans regroupement"}</caption>
             <thead>
                 <tr>
                     <th>Xᵢ¹</th>
@@ -69,31 +69,31 @@ export default class TableRésultats {
             <tbody>
         `;
         let résultats = [];
-        if (regrouped) {
-            this.regroupTable(this.table);
-            this.tableRegrouped.forEach((row) => {
-                innerHTML+= this.rowHtml(row);
+        if (regroupé) {
+            this.regroupementTable(this.table);
+            this.tableRegroupé.forEach((ligne) => {
+                innerHTML+= this.ligneHtml(ligne);
             });
-            résultats = [this.totalContributions(this.tableRegrouped) ,jStat.chisquare.inv(1 - alpha, this.v(regrouped))];
+            résultats = [this.totalContributions(this.tableRegroupé) ,jStat.chisquare.inv(1 - alpha, this.v(regroupé))];
             this.résultatsRegroupés = résultats;
         } else {
-            this.table.forEach((row) => {
-                innerHTML+= this.rowHtml(row);
+            this.table.forEach((ligne) => {
+                innerHTML+= this.ligneHtml(ligne);
             });
-            résultats = [this.totalContributions(this.table) ,jStat.chisquare.inv(1 - alpha, this.v(regrouped))];
+            résultats = [this.totalContributions(this.table) ,jStat.chisquare.inv(1 - alpha, this.v(regroupé))];
             this.résultas = résultats;
         }
         innerHTML+= this.résultatsHtml(résultats);
         return innerHTML;
     }
-    rowHtml(row) {
+    ligneHtml(ligne) {
         return `
             <tr>
-                <td>${row.Xi}</td>
-                <td>${row.ri}</td>
-                <td>${row.pi.toFixed(4)}</td>
-                <td>${row.npi.toFixed(4)}</td>
-                <td>${row.contribution.toFixed(4)}</td>
+                <td>${ligne.Xi}</td>
+                <td>${ligne.ri}</td>
+                <td>${ligne.pi.toFixed(4)}</td>
+                <td>${ligne.npi.toFixed(4)}</td>
+                <td>${ligne.contribution.toFixed(4)}</td>
             </tr>
         `;
     }
@@ -102,11 +102,11 @@ export default class TableRésultats {
             </tbody>
             <tfoot>
                 <tr>
-                    <th scope="row" colspan="4">X² observé</th>
+                    <th scope="ligne" colspan="4">X² observé</th>
                     <td>${résultas[0]}</td>
                 </tr>
                 <tr>
-                    <th scope="row" colspan="4">Valeur critique</th>
+                    <th scope="ligne" colspan="4">Valeur critique</th>
                     <td>${résultas[1]}</td>
                 </tr>
             </tfoot>
@@ -115,13 +115,13 @@ export default class TableRésultats {
     }
     totalContributions(table) {
         let total = 0;
-        table.forEach((row) => {
-            total +=  row.contribution;
+        table.forEach((ligne) => {
+            total +=  ligne.contribution;
         })
         return total;
     }
-    v(regrouped = false) {
-        return regrouped ? this.tableRegrouped.length-1 : this.table.length-1;
+    v(regroupé = false) {
+        return regroupé ? this.tableRegroupé.length-1 : this.table.length-1;
     }
     getRésultats() {
         return this.résultas;

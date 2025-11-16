@@ -30,7 +30,7 @@ export default function test_carre(params, resultsTable) {
                 npi: npi,
                 contribution: contribution,
             }
-            resultsTable.addRow(row);
+            resultsTable.ajouteLigne(row);
         }
     }
 }

@@ -1,12 +1,12 @@
 import TableRésultats from "./tableRésultats.js";
 export default class Test {
-    constructor(nameTest, type, fonction, params) {
+    constructor(nomTest, type, fonction, params) {
         this.div = document.createElement("div");
         this.div.classList.add("test");
-        this.div.innerHTML += `<h1>${nameTest}</h1>`;
+        this.div.innerHTML += `<h1>${nomTest}</h1>`;
         this.fonction = fonction;
         this.params = params;
-        this.nameTest = nameTest;
+        this.nomTest = nomTest;
         this.type = type;
         this.makeThetest();
     }
@@ -69,20 +69,20 @@ export default class Test {
         `;
     }
     étape3() {
-        const result = new TableRésultats(this.nameTest);
-        this.fonction(this.params, result);
+        const résultats = new TableRésultats(this.nomTest);
+        this.fonction(this.params, résultats);
         this.div.innerHTML += `<h3>Etape 3 : Calcul des Fréquences Observées et Théoriques</h3>
-            ${result.getTableHtml(this.params.alpha, false)}
+            ${résultats.getTableHtml(this.params.alpha, false)}
         `;
     }
     étape4() {
-        const result = new TableRésultats(this.nameTest);
-        this.fonction(this.params, result);
-        this.div.innerHTML += `<h3>Etape 4 : Vérification des Conditions du Test</h3>
-            ${result.getTableHtml(this.params.alpha, true)}
+        const résultats = new TableRésultats(this.nomTest);
+        this.fonction(this.params, résultats);
+        this.div.innerHTML += `<h3>Etape 4 : Vérification des npi</h3>
+            ${résultats.getTableHtml(this.params.alpha, true)}
         `;
-        this.résultats = result.getRésultatsRegroupés();
-        this.v = result.v(true);
+        this.résultats = résultats.getRésultatsRegroupés();
+        this.v = résultats.v(true);
     }
     étape5() {
         this.div.innerHTML += `<h3>Etape 5 : Détermination des Degrés de Liberté et de la Valeur Critique</h3>
@@ -91,7 +91,7 @@ export default class Test {
             <h4>Valeur Critique</h4>
             <p>Pour un niveau de signification α = ${this.params.alpha * 100}% 
             et degrés de liberté v = ${this.v} :</p>
-            <li><strong>valeur Critique</strong> = ${this.résultats[1]}</li>
+            <li><strong>valeur critique</strong> = ${this.résultats[1]}</li>
         `;
     }
     étape6() {

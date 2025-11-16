@@ -30,6 +30,6 @@ export default function test_saut(params, resultsTable) {
             npi: npi,
             contribution: contribution,
         }
-        resultsTable.addRow(row);
+        resultsTable.ajouteLigne(row);
     } 
 }

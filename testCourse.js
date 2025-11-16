@@ -28,7 +28,7 @@ export default function test_course(params, resultsTable) {
             npi: npi,
             contribution: contribution,
         }
-        resultsTable.addRow(row);
+        resultsTable.ajouteLigne(row);
     }
 }
 const factorial = n =>
