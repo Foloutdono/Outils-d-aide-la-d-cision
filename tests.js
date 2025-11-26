@@ -54,14 +54,44 @@ function init() {
             const suiteGénéré = document.createElement("div");
             suiteGénéré.id= "valeursSuite";
             suiteGénéré.innerHTML = `
-                <h1>Suite Générée</h1>
-                <ul>
-                    <li>xn : ${formatArray(xn, 0)}</li>
-                    <li>un : ${formatArray(un, 4)}</li>
-                    <li>yn : ${formatArray(yn, 0)}</li>
-                    <li>période : ${per}</li>
-                    <li>n : ${n}</li>
-                </ul>
+                <table>
+                    <caption>Paramètres</caption>
+                    <tr>
+                        <th>m</th>
+                        <td>${m}</td>
+                    </tr>
+                    <tr>
+                        <th>a</th>
+                        <td>${a}</td>
+                    </tr>
+                    <tr>
+                        <th>c</th>
+                        <td>${c}</td>
+                    </tr>
+                    <tr>
+                        <th>n</th>
+                        <td>${n}</td>
+                    </tr>
+                </table>
+                <table>
+                    <caption>Suite généré</caption>
+                    <tr>
+                        <th>xn</th>
+                        <td>${formatArray(xn, 0)}</td>
+                    </tr>
+                    <tr>
+                        <th>un</th>
+                        <td>${formatArray(un, 4)}</td>
+                    </tr>
+                    <tr>
+                        <th>yn</th>
+                        <td>${formatArray(yn, 0)}</td>
+                    </tr>
+                    <tr>
+                        <th>période</th>
+                        <td>${per}</td>
+                    </tr>
+                </table>
             `;
             document.body.appendChild(suiteGénéré);
 

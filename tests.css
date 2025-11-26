@@ -17,6 +17,10 @@ img {
 p {
   width: fit-content;
 }
+#valeursSuite {
+  display: flex;
+  justify-content: center;
+}
 
 #userForm fieldset {
   margin-bottom: 5%;

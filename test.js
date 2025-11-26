@@ -87,11 +87,11 @@ export default class Test {
     étape5() {
         this.div.innerHTML += `<h3>Etape 5 : Détermination des Degrés de Liberté et de la Valeur Critique</h3>
             <h4>Nombre de Degrés de Liberté (v)</h4>
-            <li><strong>v</strong> = ${this.v+1} - 1 = ${this.v}</li>
+            <ul><li><strong>v</strong> = ${this.v+1} - 1 = ${this.v}</li></ul>
             <h4>Valeur Critique</h4>
             <p>Pour un niveau de signification α = ${this.params.alpha * 100}% 
             et degrés de liberté v = ${this.v} :</p>
-            <li><strong>valeur critique</strong> = ${this.résultats[1]}</li>
+            <ul><li><strong>valeur critique</strong> = ${this.résultats[1]}</li></ul>
         `;
     }
     étape6() {
