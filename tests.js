@@ -49,7 +49,7 @@ function init() {
             const xn = generator(x0, a, c, m, n);
             const un = xn.map((x) => (x / m));
             const yn = un.map((u) => parseInt(u*10));
-            const per = periode(x0, a, c, m);
+            const per = m;
 
             const suiteGénéré = document.createElement("div");
             suiteGénéré.id= "valeursSuite";
@@ -180,6 +180,7 @@ function generator(x0, a, c, m, n) {
     for (let i = 0;i < n-1; i++) {
         random_numbers.push((a*random_numbers[i]+c)%m);
     }
+    console.log(random_numbers);
     return random_numbers;
 }
 function periode(x0, a, c, m) {
