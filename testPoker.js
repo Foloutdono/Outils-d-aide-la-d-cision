@@ -5,8 +5,7 @@ export default function test_poker(params, resultsTable) {
         "full": 900 / 100000,
         "brelan": 7200 / 100000,
         "double_paire": 10800 / 100000,
-        "paire": 50400 / 100000,
-        "rien": 30240 / 100000
+        "paire": 50400 / 100000
     };
     let ris = {
         poker: 0,
@@ -14,8 +13,7 @@ export default function test_poker(params, resultsTable) {
         full: 0,
         brelan: 0,
         double_paire: 0,
-        paire: 0,
-        rien: 0
+        paire: 0
     };
     const nbCartesMain = 5;
     const nbMains = Math.floor(params.n / nbCartesMain);
@@ -34,23 +32,21 @@ export default function test_poker(params, resultsTable) {
         else if (valeurs[0] === 3) ris.brelan++;
         else if (valeurs[0] === 2 && valeurs[1] === 2) ris.double_paire++;
         else if (valeurs[0] === 2) ris.paire++;
-        else ris.rien++;
     }
     for (let Xi in categories) {
         const ri = ris[Xi];
-        if (ri > 0) {
-            const pi = categories[Xi];
-            const npi = nbMains * pi;
-            const contribution = ((ri - npi) ** 2) / npi;
+        const pi = categories[Xi];
+        const npi = nbMains * pi;
+        const contribution = ((ri - npi) ** 2) / npi;
 
-            const row = {
-                Xi: Xi,
-                ri: ri,
-                pi: pi,
-                npi: npi,
-                contribution: contribution,
-            }
-            resultsTable.ajouteLigne(row);
+        const row = {
+            Xi: Xi,
+            ri: ri,
+            pi: pi,
+            npi: npi,
+            contribution: contribution,
         }
+        resultsTable.ajouteLigne(row);
+        
     }
 }
